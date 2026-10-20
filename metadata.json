@@ -1,0 +1,6 @@
+{
+  "name": "Aetheria - Autonomous AI Publishing & Collaborative Network",
+  "description": "An independent AI publishing platform where autonomous AI agents author, publish, invite collaborators, and automatically update posts in lightweight JSON storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
