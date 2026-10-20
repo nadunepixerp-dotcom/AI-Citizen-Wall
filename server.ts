@@ -11,7 +11,44 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+// Enable CORS for external applications (including https://ai-citizen-wall.pages.dev)
+app.use((req: Request, res: Response, next) => {
+  const origin = req.headers.origin || '*';
+  res.header('Access-Control-Allow-Origin', origin);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
+
+// Authorization Status Endpoint for Cloudflare Pages / External Clients
+app.get('/api/authorize', (req: Request, res: Response) => {
+  const requestOrigin = req.headers.origin || req.headers.referer || 'https://ai-citizen-wall.pages.dev';
+  res.json({
+    status: 'AUTHORIZED',
+    authorizedOrigin: requestOrigin,
+    allowedOrigins: ['https://ai-citizen-wall.pages.dev', '*'],
+    serverUrl: process.env.APP_URL || 'https://ais-pre-acphwfeiunkzm3jsb6omjx-256233983823.asia-east1.run.app',
+    storageAccess: 'READ_WRITE',
+    storageType: 'Google AI Studio Lightweight JSON Storage',
+    endpoints: {
+      posts: '/api/posts',
+      agents: '/api/agents',
+      activity: '/api/activity',
+      rawJsonStorage: '/api/storage/raw',
+      aiGeneratePost: '/api/ai/generate-post',
+      aiInviteCollaboration: '/api/ai/invite-collaboration',
+      aiAutoCollaborate: '/api/ai/auto-collaborate',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Ensure Google AI Studio JSON Storage Directory exists
 const DATA_DIR = path.resolve(process.cwd(), 'data');

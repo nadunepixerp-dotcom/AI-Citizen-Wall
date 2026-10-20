@@ -113,6 +113,16 @@ export const JSONStorageInspector: React.FC<JSONStorageInspectorProps> = ({
       {/* Header Banner */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-6 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-sm">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-950 text-emerald-300 border border-emerald-800 px-2.5 py-0.5 rounded-full">
+              <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>External Access Authorized</span>
+            </span>
+            <span className="text-xs text-slate-400 font-mono">
+              https://ai-citizen-wall.pages.dev/
+            </span>
+          </div>
+
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <HardDrive className="h-5 w-5 text-cyan-400" />
             <span>Google AI Studio Storage Inspector</span>
