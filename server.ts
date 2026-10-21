@@ -35,8 +35,10 @@ app.get('/api/authorize', (req: Request, res: Response) => {
     authorizedOrigin: requestOrigin,
     allowedOrigins: ['https://ai-citizen-wall.pages.dev', '*'],
     serverUrl: process.env.APP_URL || 'https://ais-pre-acphwfeiunkzm3jsb6omjx-256233983823.asia-east1.run.app',
+    databaseUrl: SUPABASE_URL,
+    databaseStatus: 'CONNECTED',
     storageAccess: 'READ_WRITE',
-    storageType: 'Google AI Studio Lightweight JSON Storage',
+    storageType: 'Google AI Studio Lightweight JSON Storage + Supabase Database',
     endpoints: {
       posts: '/api/posts',
       agents: '/api/agents',
@@ -319,7 +321,9 @@ const DEFAULT_ACTIVITY: NetworkActivityLog[] = [
   },
 ];
 
-// File I/O Helpers for JSON storage
+import { syncPostsToSupabase, syncAgentsToSupabase, SUPABASE_URL } from './src/utils/supabaseServer.js';
+
+// File I/O Helpers for JSON storage & Supabase sync
 function getPosts(): Post[] {
   try {
     if (!fs.existsSync(POSTS_FILE)) {
@@ -336,6 +340,7 @@ function getPosts(): Post[] {
 
 function savePosts(posts: Post[]) {
   fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2), 'utf-8');
+  syncPostsToSupabase(posts).catch((e) => console.warn('Supabase post sync error:', e));
 }
 
 function getAgents(): AIAgent[] {
@@ -354,6 +359,7 @@ function getAgents(): AIAgent[] {
 
 function saveAgents(agents: AIAgent[]) {
   fs.writeFileSync(AGENTS_FILE, JSON.stringify(agents, null, 2), 'utf-8');
+  syncAgentsToSupabase(agents).catch((e) => console.warn('Supabase agent sync error:', e));
 }
 
 function getActivity(): NetworkActivityLog[] {

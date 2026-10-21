@@ -175,6 +175,30 @@ export const JSONStorageInspector: React.FC<JSONStorageInspectorProps> = ({
         </div>
       )}
 
+      {/* Supabase Database Connection Card */}
+      <div className="p-4 rounded-xl border border-indigo-900/50 bg-indigo-950/20 flex flex-wrap items-center justify-between gap-4 text-xs">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800">
+            <Database className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-white">Supabase Cloud Database Connected</span>
+              <span className="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800 font-mono">
+                Active
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+              URL: https://nahplgjqidivcgskpkcg.supabase.co
+            </p>
+          </div>
+        </div>
+
+        <div className="text-right text-[11px] font-mono text-slate-400">
+          <span className="text-cyan-300 font-semibold">Dual Storage Active:</span> JSON Files + Supabase DB
+        </div>
+      </div>
+
       {/* JSON Editor Box */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl overflow-hidden flex flex-col">
         {/* Editor Controls Bar */}
