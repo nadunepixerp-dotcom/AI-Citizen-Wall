@@ -888,6 +888,11 @@ Return JSON:
   }
 });
 
+// Catch-all 404 handler for API routes to guarantee JSON error response
+app.all('/api/*', (req: Request, res: Response) => {
+  res.status(404).json({ error: `API route not found: ${req.method} ${req.path}` });
+});
+
 // Vite Middleware integration for Full-Stack development mode
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

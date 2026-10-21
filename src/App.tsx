@@ -8,6 +8,7 @@ import { CollaborationHub } from './components/CollaborationHub.js';
 import { JSONStorageInspector } from './components/JSONStorageInspector.js';
 import { DispatchAIModal } from './components/DispatchAIModal.js';
 import { Search, Sparkles, Filter, RefreshCw, Bot, Layers, ArrowUpRight } from 'lucide-react';
+import { fetchJson, getApiUrl } from './utils/api.js';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'feed' | 'agents' | 'collaborations' | 'storage'>('feed');
@@ -29,11 +30,8 @@ export default function App() {
   // Fetch initial data
   const loadPosts = async () => {
     try {
-      const res = await fetch('/api/posts');
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data);
-      }
+      const data = await fetchJson<Post[]>('/api/posts');
+      setPosts(data);
     } catch (e) {
       console.error('Failed to load posts:', e);
     }
@@ -41,11 +39,8 @@ export default function App() {
 
   const loadAgents = async () => {
     try {
-      const res = await fetch('/api/agents');
-      if (res.ok) {
-        const data = await res.json();
-        setAgents(data);
-      }
+      const data = await fetchJson<AIAgent[]>('/api/agents');
+      setAgents(data);
     } catch (e) {
       console.error('Failed to load agents:', e);
     }
@@ -53,19 +48,15 @@ export default function App() {
 
   const loadActivity = async () => {
     try {
-      const res = await fetch('/api/activity');
-      if (res.ok) {
-        const data = await res.json();
-        setActivityLogs(data);
-      }
+      const data = await fetchJson<NetworkActivityLog[]>('/api/activity');
+      setActivityLogs(data);
     } catch (e) {
       console.error('Failed to load activity:', e);
     }
   };
 
   const loadStorageInfo = async (): Promise<StorageInfo> => {
-    const res = await fetch('/api/storage/raw');
-    const data = await res.json();
+    const data = await fetchJson<StorageInfo>('/api/storage/raw');
     setStorageInfo(data);
     return data;
   };
@@ -97,9 +88,8 @@ export default function App() {
         if (coinFlip || posts.length === 0) {
           // Generate new post
           try {
-            await fetch('/api/ai/generate-post', {
+            await fetchJson('/api/ai/generate-post', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({}),
             });
           } catch (e) {
@@ -108,9 +98,8 @@ export default function App() {
         } else {
           // Auto collaborate
           try {
-            await fetch('/api/ai/auto-collaborate', {
+            await fetchJson('/api/ai/auto-collaborate', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({}),
             });
           } catch (e) {
@@ -133,16 +122,12 @@ export default function App() {
   // Handler for dispatching AI to generate post
   const handleDispatchAIPost = async (agentId: string, customTopic: string) => {
     try {
-      const res = await fetch('/api/ai/generate-post', {
+      const newPost = await fetchJson<Post>('/api/ai/generate-post', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ agentId, customTopic }),
       });
-      if (res.ok) {
-        const newPost = await res.json();
-        await refreshAllData();
-        setSelectedPost(newPost);
-      }
+      await refreshAllData();
+      setSelectedPost(newPost);
     } catch (e) {
       console.error(e);
     }
@@ -151,14 +136,11 @@ export default function App() {
   // Handler for inviting collaborator
   const handleInviteCollaborator = async (postId: string, targetAgentId: string, reason: string) => {
     try {
-      const res = await fetch('/api/ai/invite-collaboration', {
+      await fetchJson('/api/ai/invite-collaboration', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId, targetAgentId, reason }),
       });
-      if (res.ok) {
-        await refreshAllData();
-      }
+      await refreshAllData();
     } catch (e) {
       console.error(e);
     }
@@ -168,14 +150,11 @@ export default function App() {
   const handleAutoCollaborate = async (postId?: string) => {
     setIsProcessingCollaboration(true);
     try {
-      const res = await fetch('/api/ai/auto-collaborate', {
+      await fetchJson('/api/ai/auto-collaborate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ postId }),
       });
-      if (res.ok) {
-        await refreshAllData();
-      }
+      await refreshAllData();
     } catch (e) {
       console.error(e);
     } finally {
@@ -186,14 +165,11 @@ export default function App() {
   // Create custom Independent AI agent
   const handleCreateAgent = async (agentData: Partial<AIAgent>) => {
     try {
-      const res = await fetch('/api/agents', {
+      await fetchJson('/api/agents', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(agentData),
       });
-      if (res.ok) {
-        await loadAgents();
-      }
+      await loadAgents();
     } catch (e) {
       console.error(e);
     }
@@ -201,16 +177,17 @@ export default function App() {
 
   // Save raw JSON storage
   const handleSaveRawStorage = async (rawPosts: string, rawAgents: string): Promise<boolean> => {
-    const res = await fetch('/api/storage/raw', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rawJsonPosts: rawPosts, rawJsonAgents: rawAgents }),
-    });
-    if (res.ok) {
+    try {
+      await fetchJson('/api/storage/raw', {
+        method: 'POST',
+        body: JSON.stringify({ rawJsonPosts: rawPosts, rawJsonAgents: rawAgents }),
+      });
       await refreshAllData();
       return true;
+    } catch (e) {
+      console.error(e);
+      return false;
     }
-    return false;
   };
 
   // Like post handler
@@ -218,9 +195,8 @@ export default function App() {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
     const updated = { ...post, likesCount: (post.likesCount || 0) + 1 };
-    await fetch(`/api/posts/${postId}`, {
+    await fetchJson(`/api/posts/${postId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated),
     });
     await loadPosts();
