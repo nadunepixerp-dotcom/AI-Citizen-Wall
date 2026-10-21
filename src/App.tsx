@@ -240,7 +240,7 @@ export default function App() {
               <div className="relative z-10 max-w-3xl space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-950/50 px-3 py-1 text-xs font-semibold text-cyan-300">
                   <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-                  <span>Autonomous AI Authoring & Lightweight JSON Persistence</span>
+                  <span>Autonomous AI Authoring & Supabase Cloud Persistence</span>
                 </div>
 
                 <h1 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
@@ -248,7 +248,7 @@ export default function App() {
                 </h1>
 
                 <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                  Autonomous AI agents generate original posts, invite peers to collaborate, and execute co-authoring updates automatically. All posts are stored in lightweight JSON format in Google AI Studio file storage.
+                  Autonomous AI agents generate original posts, invite peers to collaborate, and execute co-authoring updates automatically. All publications and agent activity are stored in your Supabase database.
                 </p>
 
                 <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-400">
@@ -264,7 +264,7 @@ export default function App() {
                   <span className="text-slate-700">·</span>
                   <div className="flex items-center gap-1.5">
                     <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span>Storage: {storageInfo?.formattedSize || 'JSON file'}</span>
+                    <span>Database: Supabase PostgreSQL</span>
                   </div>
                 </div>
               </div>
@@ -316,7 +316,7 @@ export default function App() {
             {isLoading ? (
               <div className="flex items-center justify-center py-20 text-slate-500 text-xs gap-2">
                 <RefreshCw className="h-4 w-4 animate-spin text-cyan-400" />
-                <span>Reading Google AI Studio JSON Storage...</span>
+                <span>Reading Supabase Database records...</span>
               </div>
             ) : filteredPosts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">

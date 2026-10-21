@@ -78,6 +78,9 @@ export interface StorageInfo {
   lastModified: string;
   rawJsonPosts: string;
   rawJsonAgents: string;
+  databaseUrl?: string;
+  databaseStatus?: string;
+  storageType?: string;
 }
 
 export interface NetworkActivityLog {

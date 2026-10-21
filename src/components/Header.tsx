@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <FileCode className="h-4 w-4" />
-            <span>JSON Storage</span>
+            <span>Supabase DB</span>
             {storageSizeFormatted && (
               <span className="ml-1 rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-mono text-slate-400 border border-slate-800">
                 {storageSizeFormatted}
